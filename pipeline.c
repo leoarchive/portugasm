@@ -134,7 +134,7 @@ lex (PtAsm_t **ptasm, FILE *pt)
 }
 
 void
-set_source_file (ContTks_t *in, FILE *src)
+parser (ContTks_t *in, FILE *src)
 {
     if (!in) return;
     if (in->tk && strcmp(in->tk, "\n") == 0)
@@ -154,7 +154,7 @@ set_source_file (ContTks_t *in, FILE *src)
             fprintf(src, "%s ", i < NTKS ? tk.asm_tk : in->tk);
         }
 
-    set_source_file (in->n, src);
+    parser (in->n, src);
 }
 
 int
@@ -184,7 +184,7 @@ main (int argc, char **argv)
 
     lex(&ptasm, pt);
 
-    set_source_file (ptasm->i, src);
+    parser (ptasm->i, src);
 
     fclose (src);
     fclose (pt);
