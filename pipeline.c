@@ -32,7 +32,7 @@ struct content_tks
 };
 
 /*
- * PTASM TOKENS QUEUE
+ * PTASM TOKEN LIST
  */
 struct portugasm
 {
@@ -54,8 +54,21 @@ static Tokens_t TK[] =
 {
     { "SECTION","SECAO" },
     { ".data",".dados" },
+    { "SECTION .data","SECAO_DE_DADOS" },
     { ".bss",".blcinc" },
+    { "SECTION .bss","SECAO_INICIAL" },
     { ".text",".texto" },
+    { "SECTION .text","SECAO_DE_TEXTO" },
+    { "main","principal" },
+    { "main:","principal:" },
+    /*
+     * TYPES
+     */
+    { "DB","1BYTE" },
+    { "DW","2BYTE" },
+    { "DD","4BYTE" },
+    { "DQ","8BYTE" },
+    { "DT","10BYTE" },
     /*
      * INSTRUCTIONS
      */
