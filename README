@@ -1,0 +1,10 @@
+Portugasm is a translated programming language from assembly x86 to Brazilian portuguese
+
+## install
+
+make
+
+## run 
+
+./ptasm <file.asm>
+

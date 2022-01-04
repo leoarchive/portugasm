@@ -1,4 +1,4 @@
-TARGET=portugasm
+TARGET=ptasm
 LIBS=
 CC=gcc
 CFLAGS= -pedantic -Wall -std=c99
