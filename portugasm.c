@@ -59,9 +59,9 @@ static Tokens_t TK[] =
     { "SECTION .bss","SECAO_INICIAL" },
     { ".text",".texto" },
     { "SECTION .text","SECAO_DE_TEXTO" },
-	{ "main","principal" },
-	{ "main:","principal:" },
-	{ ",","<-" },
+    { "main","principal" },
+    { "main:","principal:" },
+    { ",","<-" },
     /*
      * TYPES
      */
@@ -79,43 +79,42 @@ static Tokens_t TK[] =
     { "DIV","DIVIDIR" },
     { "MUL","MULTIPLICAR" },
     { "RET","RETORNAR" },
-	{ "SYSCALL","CHAMADA_SISTEMA" },
-	{ "CALL","CHAMADA" },
+    { "SYSCALL","CHAMADA_SISTEMA" },
+    { "CALL","CHAMADA" },
 };
 
 /*
- * aux functions
+ * AUX FUNCTIONS
  */
-
 size_t
 get_arg_var(char *arg)
 {
-	if (strcmp(arg, "-felf64") == 0) 
-	{
-		return 1;
-	}
-	return 0;
+    if (strcmp(arg, "-felf64") == 0)
+        {
+            return 1;
+        }
+    return 0;
 }
 
 char *
 get_arg_str(char *var)
 {
-	switch (get_arg_var(var))
-	{
-		case 1:
-			return "_start";
-		default: 
-			return NULL;
-	}
-	return NULL;
+    switch (get_arg_var(var))
+        {
+        case 1:
+            return "_start";
+        default:
+            return NULL;
+        }
+    return NULL;
 }
 
 char *
 remove_spaces(char *tk)
 {
-	while ((*tk == ' ') || (*tk == '\t'))
-    	++tk;
-	return tk;
+    while ((*tk == ' ') || (*tk == '\t'))
+        ++tk;
+    return tk;
 }
 /**/
 
@@ -154,21 +153,21 @@ lex (PtAsm_t **ptasm, FILE *pt)
             while (tk)
                 {
 
-					if (strchr(tk, ' ') || strchr(tk, '\t'))
-					{
-							tk = remove_spaces(tk);
-							get_content_tk (&(*ptasm), tk);
-					}
-					else if (strchr(tk, '\n')) 
-					{
-							tk[strlen(tk) - 1] = '\0';
+                    if (strchr(tk, ' ') || strchr(tk, '\t'))
+                        {
+                            tk = remove_spaces(tk);
+                            get_content_tk (&(*ptasm), tk);
+                        }
+                    else if (strchr(tk, '\n'))
+                        {
+                            tk[strlen(tk) - 1] = '\0';
                             get_content_tk (&(*ptasm), tk);
                             get_content_tk (&(*ptasm), "\n");
-					} 
-					else 
-					{
+                        }
+                    else
+                        {
                             get_content_tk (&(*ptasm), tk);
-					}
+                        }
 
 
                     tk = strtok(NULL, " ");
@@ -182,51 +181,61 @@ void
 parser (ContTks_t *in, FILE *src, char *argStr)
 {
     if (!in) return;
-    if (in->tk && strcmp(in->tk, "\n") == 0)
+	if (strcmp(in->tk, "<-") == 0)
+	{
+			fprintf(src, ",");
+	}
+    else if (strcmp(in->tk, "\n") == 0)
         {
             fprintf(src, "%s", in->tk);
         }
-    else if (in->tk && strcmp(in->tk,"\0"))
+    else if (strcmp(in->tk,"\0"))
         {
             Tokens_t tk;
             size_t i;
-			_Bool isArgStr = 0;
-			_Bool isArgStrWithColon = 0;
+            _Bool isArgStr = 0;
+            _Bool isArgStrWithColon = 0;
 
             for (i = 0; i < NTKS; ++i)
                 {
                     tk = TK[i];
-					if (argStr) 
-					{
-						if (strcmp(in->tk, "principal") == 0)
-						{
-							isArgStr = 1;
-							break;
-						}
-						else if (strcmp(in->tk, "principal:") == 0) {
-							isArgStrWithColon = 1;
-							break;
-						}
-					}
-                    if (strcmp(in->tk, tk.pt_tk) == 0) 
-						break;
+                    if (argStr)
+                        {
+                            if (strcmp(in->tk, "principal") == 0)
+                                {
+                                    isArgStr = 1;
+                                    break;
+                                }
+                            else if (strcmp(in->tk, "principal:") == 0)
+                                {
+                                    isArgStrWithColon = 1;
+                                    break;
+                                }
+                        }
+                    if (strcmp(in->tk, tk.pt_tk) == 0)
+                        break;
                 }
-			//printf("\"%s\"", in->tk);
+            //printf("\"%s\"", in->tk);
 
-			if (isArgStr) 
-			{
-				isArgStr = 0;
-				fprintf(src, "%s ", argStr);	
-			}
-			else if (isArgStrWithColon)
-			{
-				isArgStrWithColon = 0;
-				fprintf(src, "%s: ", argStr);	
-			}
-			else 
-			{
-            	fprintf(src, "%s ", i < NTKS ? tk.asm_tk : in->tk);
-			}
+            if (isArgStr)
+                {
+                    isArgStr = 0;
+                    fprintf(src, "%s ", argStr);
+                }
+            else if (isArgStrWithColon)
+                {
+                    isArgStrWithColon = 0;
+                    fprintf(src, "%s: ", argStr);
+                }
+            else
+                {
+					_Bool arrow = 0;
+					if (in->n->tk && strcmp(in->n->tk, "<-") == 0) 
+						arrow = 1;
+					
+                    fprintf(src, "%s%c", i < NTKS ? tk.asm_tk : in->tk, arrow ? '\0' : ' ');
+					arrow = 0;
+                }
         }
 
     parser (in->n, src, argStr);
@@ -235,9 +244,9 @@ parser (ContTks_t *in, FILE *src, char *argStr)
 int
 main (int argc, char **argv)
 {
-	size_t argFile = 1;
-	char *auxVarStr = get_arg_str(argv[1]);
-	if (auxVarStr) argFile = 2;
+    size_t argFile = 1;
+    char *auxVarStr = get_arg_str(argv[1]);
+    if (auxVarStr) argFile = 2;
 
     FILE *pt = fopen(argv[argFile],"r");
     if (!pt) exit (EXIT_FAILURE);
@@ -263,7 +272,7 @@ main (int argc, char **argv)
 
     lex(&ptasm, pt);
 
-    parser (ptasm->i, src, auxVarStr);
+    parser (ptasm->i->n, src, auxVarStr);
 
     fclose (src);
     fclose (pt);

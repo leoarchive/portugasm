@@ -1,6 +1,6 @@
 TARGET=ptasm
 LIBS=
-CC=gcc
+CC=clang
 CFLAGS= -pedantic -Wall -std=c99
 
 .PHONY: default all
