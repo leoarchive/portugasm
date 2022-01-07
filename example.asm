@@ -8,12 +8,12 @@ subtracao 1BYTE 00
 SECAO_DE_TEXTO
 GLOBAL principal
 principal:
-    MOVER EAX, [num1] 
-    MOVER EBX, [num2]
-    MOVER ECX, [num3]
-    ADICIONAR EAX, EBX
-    MOVER [soma], EAX
-    SUBTRAIR EAX, ECX 
-    MOVER [subtracao], EAX
-    MOVER EAX, 0
+    MOVER EAX <- [num1] 
+    MOVER EBX <- [num2]
+    MOVER ECX <- [num3]
+    ADICIONAR EAX <- EBX
+    MOVER [soma] <- EAX
+    SUBTRAIR EAX <- ECX 
+    MOVER [subtracao] <- EAX
+    MOVER EAX <- 0
     RETORNAR 
