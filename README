@@ -1,10 +1,10 @@
 Portugasm is a translated programming language from assembly x86 to Brazilian portuguese
 
-## install
+## make and path
 
-make
+make; export PATH="$PATH:$PWD"
 
-## run 
+## assembler 
 
-./ptasm <file.asm>
+./ptasm -h
 

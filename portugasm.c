@@ -83,30 +83,36 @@ static Tokens_t TK[] =
     { "CALL","CHAMADA" },
 };
 
+
+enum
+{
+    HELP = 1,
+    FELF64,
+};
+
 /*
  * AUX FUNCTIONS
  */
 size_t
-get_arg_var(char *arg)
+get_command(const char *commands[], const char *arg)
 {
-    if (strcmp(arg, "-felf64") == 0)
-        {
-            return 1;
-        }
-    return 0;
+    if (strcmp(arg, (*commands)) == 0)
+        return 0;
+    commands++;
+    return 1 + get_command(commands, arg);
 }
 
-char *
-get_arg_str(char *var)
+size_t
+get_flag(char *var)
 {
-    switch (get_arg_var(var))
-        {
-        case 1:
-            return "_start";
-        default:
-            return NULL;
-        }
-    return NULL;
+    const char *commands[] =
+    {
+        "-felf64",
+        "-help",
+        NULL
+    };
+
+    return get_command(commands, var);
 }
 
 char *
@@ -178,14 +184,11 @@ lex (PtAsm_t **ptasm, FILE *pt)
 }
 
 void
-parser (ContTks_t *in, FILE *src, char *argStr)
+parser (ContTks_t *in, FILE *src, size_t flag)
 {
     if (!in) return;
-	if (strcmp(in->tk, "<-") == 0)
-	{
-			fprintf(src, ",");
-	}
-    else if (strcmp(in->tk, "\n") == 0)
+
+    if (strcmp(in->tk, "\n") == 0)
         {
             fprintf(src, "%s", in->tk);
         }
@@ -193,22 +196,22 @@ parser (ContTks_t *in, FILE *src, char *argStr)
         {
             Tokens_t tk;
             size_t i;
-            _Bool isArgStr = 0;
-            _Bool isArgStrWithColon = 0;
+            _Bool isMain64 = 0;
+            _Bool isMain64Colon = 0;
 
             for (i = 0; i < NTKS; ++i)
                 {
                     tk = TK[i];
-                    if (argStr)
+                    if (flag == FELF64)
                         {
                             if (strcmp(in->tk, "principal") == 0)
                                 {
-                                    isArgStr = 1;
+                                    isMain64 = 1;
                                     break;
                                 }
                             else if (strcmp(in->tk, "principal:") == 0)
                                 {
-                                    isArgStrWithColon = 1;
+                                    isMain64Colon = 1;
                                     break;
                                 }
                         }
@@ -217,36 +220,48 @@ parser (ContTks_t *in, FILE *src, char *argStr)
                 }
             //printf("\"%s\"", in->tk);
 
-            if (isArgStr)
+            if (isMain64 || isMain64Colon)
                 {
-                    isArgStr = 0;
-                    fprintf(src, "%s ", argStr);
-                }
-            else if (isArgStrWithColon)
-                {
-                    isArgStrWithColon = 0;
-                    fprintf(src, "%s: ", argStr);
+                    fprintf(src, "_start%c ", isMain64Colon ? ':' : ' ');
+                    isMain64 = 0;
+                    isMain64Colon = 0;
                 }
             else
                 {
-					_Bool arrow = 0;
-					if (in->n->tk && strcmp(in->n->tk, "<-") == 0) 
-						arrow = 1;
-					
-                    fprintf(src, "%s%c", i < NTKS ? tk.asm_tk : in->tk, arrow ? '\0' : ' ');
-					arrow = 0;
+                    _Bool arrow = 0;
+                    if (in->n->tk && strcmp(in->n->tk, "<-") == 0)
+                        arrow = 1;
+
+                    if (arrow)
+                        {
+                            fprintf(src, "%s", i < NTKS ? tk.asm_tk : in->tk);
+                            arrow = 0;
+                        }
+                    else
+                        {
+                            fprintf(src, "%s ", i < NTKS ? tk.asm_tk : in->tk);
+                        }
                 }
         }
 
-    parser (in->n, src, argStr);
+    parser (in->n, src, flag);
 }
 
 int
 main (int argc, char **argv)
 {
     size_t argFile = 1;
-    char *auxVarStr = get_arg_str(argv[1]);
-    if (auxVarStr) argFile = 2;
+    size_t flag = get_flag(argv[1]);
+
+    if (flag == HELP)
+        {
+            printf("-help\n" \
+                   "-felf64\t\telf 64 bits file format\n");
+            return 0;
+        }
+
+
+    if (flag) argFile++;
 
     FILE *pt = fopen(argv[argFile],"r");
     if (!pt) exit (EXIT_FAILURE);
@@ -272,7 +287,7 @@ main (int argc, char **argv)
 
     lex(&ptasm, pt);
 
-    parser (ptasm->i->n, src, auxVarStr);
+    parser (ptasm->i->n, src, flag);
 
     fclose (src);
     fclose (pt);
