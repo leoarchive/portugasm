@@ -256,7 +256,10 @@ main (int argc, char **argv)
     if (flag == HELP)
         {
             printf("-help\n" \
-                   "-felf64\t\telf 64 bits file format\n");
+                   "Assemble:\n" \
+                   "\t\t./ptasm [format] <file>\n" \
+                   "Formats:\n" \
+                   "\t\t-felf64\t\telf 64 bits file format\n");
             return 0;
         }
 

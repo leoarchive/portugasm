@@ -6,5 +6,5 @@ make; export PATH="$PATH:$PWD"
 
 ## assembler 
 
-./ptasm -h
+./ptasm -help
 
