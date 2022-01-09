@@ -12,7 +12,7 @@ principal:
     mover ebx <- dados.num2
     mover ecx <- dados.num3
     adicionar eax <- ebx
-    MOVER dados.soma <- eax
+    mover dados.soma <- eax
     subtrair eax <- ecx 
     mover dados.subtracao <- eax
     mover eax <- 0

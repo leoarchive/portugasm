@@ -83,6 +83,16 @@ static Tokens_t TK[] =
     { "ret","retornar" },
     { "syscall","chamadasis" },
     { "call","chamada" },
+    { "push","insere" },
+    { "pop","retira" },
+    { "inc","incremente" },
+    { "dec","decremento" },
+    { "imult","multiplicarint" },
+    { "idiv","dividirint" },
+    { "not","nao" },
+    { "neg","negar" },
+    { "jump","salto" },
+    { "cmp","compare" },
 };
 
 
