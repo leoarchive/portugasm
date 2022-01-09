@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #define BUILD_DIR "build"
 
@@ -52,41 +53,42 @@ struct tokens
 
 static Tokens_t TK[] =
 {
-    { "SECTION","SECAO" },
+    { "section","secao" },
     { ".data",".dados" },
-    { "SECTION .data","SECAO_DE_DADOS" },
+    { "section .data","secao_dados" },
     { ".bss",".blcinc" },
-    { "SECTION .bss","SECAO_INICIAL" },
+    { "section .bss","secao_inicial" },
     { ".text",".texto" },
-    { "SECTION .text","SECAO_DE_TEXTO" },
+    { "section .text","secao_texto" },
     { "main","principal" },
     { "main:","principal:" },
     { ",","<-" },
+    {  "[","dados." },
     /*
      * TYPES
      */
-    { "DB","1BYTE" },
-    { "DW","2BYTE" },
-    { "DD","4BYTE" },
-    { "DQ","8BYTE" },
-    { "DT","10BYTE" },
+    { "db","1byte" },
+    { "dw","2byte" },
+    { "dd","4byte" },
+    { "dq","8byte" },
+    { "dt","10byte" },
     /*
      * INSTRUCTIONS
      */
-    { "ADD","ADICIONAR" },
-    { "MOV","MOVER" },
-    { "SUB","SUBTRAIR" },
-    { "DIV","DIVIDIR" },
-    { "MUL","MULTIPLICAR" },
-    { "RET","RETORNAR" },
-    { "SYSCALL","CHAMADA_SISTEMA" },
-    { "CALL","CHAMADA" },
+    { "add","adicionar" },
+    { "mov","mover" },
+    { "sub","subtrair" },
+    { "div","dividir" },
+    { "mul","multiplicar" },
+    { "ret","retornar" },
+    { "syscall","chamadasis" },
+    { "call","chamada" },
 };
 
 
 enum
 {
-    HELP = 1,
+    HELP,
     FELF64,
 };
 
@@ -94,9 +96,9 @@ enum
  * AUX FUNCTIONS
  */
 size_t
-get_command(const char *commands[], const char *arg)
+get_command(const char **commands, const char *arg)
 {
-    if (strcmp(arg, (*commands)) == 0)
+    if (!(*commands) || strcmp(arg, (*commands)) == 0)
         return 0;
     commands++;
     return 1 + get_command(commands, arg);
@@ -107,8 +109,8 @@ get_flag(char *var)
 {
     const char *commands[] =
     {
-        "-felf64",
         "-help",
+        "-felf64",
         NULL
     };
 
@@ -215,10 +217,9 @@ parser (ContTks_t *in, FILE *src, size_t flag)
                                     break;
                                 }
                         }
-                    if (strcmp(in->tk, tk.pt_tk) == 0)
+                    if (strcasecmp(in->tk, tk.pt_tk) == 0)
                         break;
                 }
-            //printf("\"%s\"", in->tk);
 
             if (isMain64 || isMain64Colon)
                 {
@@ -228,14 +229,14 @@ parser (ContTks_t *in, FILE *src, size_t flag)
                 }
             else
                 {
-                    _Bool arrow = 0;
-                    if (in->n->tk && strcmp(in->n->tk, "<-") == 0)
-                        arrow = 1;
-
-                    if (arrow)
+                    if (strstr(in->tk, "dados."))
+                        {
+                            in->tk += strlen("dados.");
+                            fprintf(src, "[%s]", in->tk);
+                        }
+                    else if (in->n->tk && strcmp(in->n->tk, "<-") == 0)
                         {
                             fprintf(src, "%s", i < NTKS ? tk.asm_tk : in->tk);
-                            arrow = 0;
                         }
                     else
                         {
@@ -250,8 +251,9 @@ parser (ContTks_t *in, FILE *src, size_t flag)
 int
 main (int argc, char **argv)
 {
-    size_t argFile = 1;
-    size_t flag = get_flag(argv[1]);
+    int flag = -1;
+    if (argc > 1)
+        flag = get_flag(argv[1]);
 
     if (flag == HELP)
         {
@@ -263,10 +265,7 @@ main (int argc, char **argv)
             return 0;
         }
 
-
-    if (flag) argFile++;
-
-    FILE *pt = fopen(argv[argFile],"r");
+    FILE *pt = fopen(argv[argc - 1],"r");
     if (!pt) exit (EXIT_FAILURE);
 
     char cmd_build_file[
@@ -277,11 +276,11 @@ main (int argc, char **argv)
     system(cmd_build_file);
 
     char build_file[
-     strlen(BUILD_DIR) + strlen(argv[argFile]) + 1];
+     strlen(BUILD_DIR) + strlen(argv[argc - 1]) + 1];
 
     strcpy(build_file, BUILD_DIR);
     strcat(build_file, "/");
-    strcat(build_file, argv[argFile]);
+    strcat(build_file, argv[argc - 1]);
 
     FILE *src = fopen(build_file,"w");
     if (!src) exit (EXIT_FAILURE);

@@ -1,19 +1,19 @@
-SECAO_DE_DADOS
-num1 1BYTE 30 
-num2 1BYTE 70
-num3 1BYTE 99
-soma 1BYTE 00
-subtracao 1BYTE 00
+secao_dados
+num1 1byte 30 
+num2 1byte 70
+num3 1byte 99
+soma 1byte 00
+subtracao 1byte 00
 
-SECAO_DE_TEXTO
-GLOBAL principal
+secao_texto
+global principal
 principal:
-    MOVER EAX <- [num1] 
-    MOVER EBX <- [num2]
-    MOVER ECX <- [num3]
-    ADICIONAR EAX <- EBX
-    MOVER [soma] <- EAX
-    SUBTRAIR EAX <- ECX 
-    MOVER [subtracao] <- EAX
-    MOVER EAX <- 0
-    RETORNAR 
+    mover eax <- dados.num1 
+    mover ebx <- dados.num2
+    mover ecx <- dados.num3
+    adicionar eax <- ebx
+    MOVER dados.soma <- eax
+    subtrair eax <- ecx 
+    mover dados.subtracao <- eax
+    mover eax <- 0
+    retornar 
