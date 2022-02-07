@@ -20,6 +20,11 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) $(CFLAGS) $(LIBS) -o $@
 
 clean: 
+	-rm -f *.orig
 	-rm -f *.o
 	-rm -f *.tmp
 	-rm -f $(TARGET)
+	-rm -rf build
+	
+format:
+	astyle --style=gnu --indent=spaces=2 *.c *.h

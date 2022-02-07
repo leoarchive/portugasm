@@ -8,12 +8,12 @@ subtracao 1byte 00
 secao_texto
 global principal
 principal:
-    mover eax <- dados.num1 
-    mover ebx <- dados.num2
-    mover ecx <- dados.num3
+    mover eax <- [num1]
+    mover ebx <- [num2]
+    mover ecx <- [num3]
     adicionar eax <- ebx
-    mover dados.soma <- eax
+    mover [soma] <- eax
     subtrair eax <- ecx 
-    mover dados.subtracao <- eax
+    mover [subtracao] <- eax
     mover eax <- 0
     retornar 
